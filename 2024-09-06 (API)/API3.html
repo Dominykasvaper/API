@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dog Breeds Search</title>
+    <style>
+    
+        #resultsContainer {
+            width: 750px;
+            height: 300px;
+            overflow-y: auto; 
+            border: 1px solid #ccc; 
+            margin-top: 10px;
+            padding: 10px;
+        }
+      
+        #sarasas {
+            padding: 0;
+            margin: 0;
+        }
+        li {
+            list-style-type: none;
+            cursor: pointer;
+            padding: 5px;
+            border-bottom: 1px solid #ccc;
+        }
+        li:hover {
+            background-color: #f0f0f0;
+        }
+
+        #dogImage {
+            margin-top: 20px;
+            width: 500px;
+            height: auto;
+            display: none; 
+        }
+      
+        input {
+            width: 750px;
+            height: 60px;
+        }
+    </style>
+</head>
+<body>
+
+    <input type="text" id="tekstas" placeholder="Įveskite produktą" oninput="filterBreeds()" />
+    <!-- Rezultatų konteineris, kuriame rodomas sąrašas -->
+    <div id="resultsContainer">
+        <ul id="sarasas"></ul>
+    </div>
+    <!-- Šunų veislės nuotraukos elementas -->
+    <img id="dogImage" src="" alt="Dog Breed Image" />
+
+    <script>
+        let breeds = [];
+
+        // Funkcija, kuri gauna visų šunų veislių sąrašą iš API
+        function fetchBreeds() {
+            return fetch("https://dog.ceo/api/breeds/list/all")
+                .then(response => response.json())
+                .then(data => {
+                    breeds = Object.keys(data.message);
+                    updateList(breeds);
+                })
+                .catch(console.error);
+        }
+
+        // Funkcija, kuri atnaujina veislių sąrašą puslapyje
+        function updateList(breeds) {
+            const listElement = document.getElementById("sarasas");
+            listElement.innerHTML = breeds.map(breed =>
+                `<li onclick="showBreedImage('${breed}')">${breed}</li>`
+            ).join('');
+        }
+
+        // Funkcija, kuri filtruojama veislių sąrašą pagal vartotojo įvestą tekstą
+        function filterBreeds() {
+            const filter = document.getElementById("tekstas").value.toUpperCase();
+            const listItems = document.querySelectorAll("#sarasas li");
+
+            // Patikrina, ar yra įvestas filtras
+            const hasFilter = filter !== "";
+            document.getElementById("resultsContainer").style.display = hasFilter ? "block" : "none";
+
+            listItems.forEach(item => {
+                const text = item.textContent.toUpperCase();
+                item.style.display = text.includes(filter) ? "block" : "none";
+            });
+
+            // Jei filtro nėra, paslepia šunų nuotrauką
+            if (!hasFilter) {
+                document.getElementById("dogImage").style.display = "none";
+            }
+        }
+
+        // Funkcija, kuri rodo atsitiktinę šunų veislės nuotrauką
+        function showBreedImage(breed) {
+            fetch(`https://dog.ceo/api/breed/${breed}/images/random`)
+                .then(response => response.json())
+                .then(data => {
+                    const imgElement = document.getElementById("dogImage");
+                    imgElement.src = data.message;
+                    imgElement.style.display = "block";
+                })
+        }
+
+        // Iškviečia funkciją, kad gautų šunų veislių sąrašą puslapio įkėlimo metu
+        fetchBreeds();
+    </script>
+</body>
+</html>

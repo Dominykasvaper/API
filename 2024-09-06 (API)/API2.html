@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <style>
+      .nuotraukos {
+        width: 500px;
+        height: 500px;
+        margin-top: 150px;
+      }
+      input {
+        width: 750px;
+        height: 60px;
+      }
+      button {
+        background-color: #1a91db;
+        font-size: 18px;
+        color: white;
+        border: none;
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+        height: 65px;
+        position: relative;
+        right: 65px;
+        top: 2px;
+      }
+      ::placeholder {
+        color: #1a91db;
+        padding: 10px;
+        font-size: 16px;
+        font-family: "Lucida Console", "Courier New", monospace;
+      }
+      .pets {
+        position: absolute;
+        top: 20px;
+        left: 275px;
+        height: 40px;
+        font-family: "Lucida Console", "Courier New", monospace;
+        font-size: 22px;
+        color: #1a91db;
+      }
+    </style>
+
+    <select class="pets"></select>
+
+    <input
+      placeholder="https://dog.ceo/api/breed/                        /images/random"
+    />
+    <button onclick="paspaudimas()">Fetch!</button>
+    <div class="suniukas"></div>
+
+    <script>
+      fetch("https://dog.ceo/api/breeds/list/all") //Naudojama, kad gautų visų šunų veislių sąrašą iš API.
+        .then((response) => response.json()) // Apdoroja API atsakymą kaip JSON objektą.
+        .then((data) => {
+          const breeds = Object.keys(data.message); // Išgauna visų veislių sąrašą iš gauto JSON
+          const selectElement = document.querySelector(".pets");
+
+          breeds.forEach((breed) => { // Prideda visas veisles kaip parinktis į išrinkimo meniu.
+            const option = document.createElement("option");
+            option.value = breed;
+            option.textContent = breed;
+            selectElement.appendChild(option);
+          });
+
+          selectElement.addEventListener("change", (pasirinkimas) => { //Kai vartotojas pasirenka veislę, kodas siunčia užklausą gauti atsitiktinę nuotrauką.
+            selectedBreed = pasirinkimas.target.value;
+
+            fetch(`https://dog.ceo/api/breed/${selectedBreed}/images/random`)
+              .then((response) => response.json())
+              .then((data) => {
+                document.querySelector(".suniukas").innerHTML = `<img class="nuotraukos" src="${data.message}">`;});
+                
+          });
+        });
+    </script>
+  </body>
+</html>
